@@ -216,7 +216,7 @@
       <h1>박정수</h1>
       <h2>Backend Engineer</h2>
     </div>
-    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 header-right"> 
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 header-right">
       <p>📮 <a href="mailto:hwasowl598@gmail.com">hwasowl598@gmail.com</a></p>
       <p>💻 <a href="https://github.com/Hwasowl" target="_blank">github.com/Hwasowl</a></p>
     </div>
@@ -326,7 +326,7 @@
         <li><b>트래픽 처리:</b> Rate Limiting, Load Balancing, Redis 캐싱</li>
         <li><b>모니터링:</b> API 로깅 시스템, Slack 알림 연동, 분산 정합성 알림</li>
         <li><b>비동기:</b> SQS, DLQ 재시도, 멱등성 키 기반 중복 방지</li>
-        
+
       </ul>
     </div>
   </div>
@@ -396,27 +396,29 @@ flowchart TD
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>결제 로직은 모놀리식, 환불과 정산은 어드민 서버에 흩어져 있어 PG사 추가나 변경 시 양쪽을 모두 수정해야 하는 구조. 결제 도메인 전체를 별도 결제 서비스로 분리.</p>
+      <p>결제 로직은 모놀리식, 환불과 정산은 어드민 서버에 흩어져 있어 PG사 추가나 변경 시 양쪽을 모두 수정해야 하는 구조. 결제 도메인 전체를 별도 결제 서비스로 분리</p>
 
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
         <li>3명 백엔드 팀으로 진행</li>
-        <li>본인은 환불 도메인 전반과 카카오페이 PG 연동, Java 엔티티 모델링 담당</li>
+        <li>주로 환불 도메인 전반과 PG 연동, Java 엔티티 모델링 작업을 진행함</li>
       </ul>
 
       <p class="sub-section">주요 업무</p>
       <ul>
-        <li>Node.js 모놀리식의 결제 개념을 Java 엔티티와 값 객체로 재모델링</li>
-        <li>환불 케이스(부분 환불, 결제수단별, 0원 결제) 결제 서버 환불 도메인으로 통합</li>
-        <li>카카오페이 PG 연동 및 PG 호출 인터페이스 캡슐화</li>
+        <li>Node.js 모놀리식의 모호한 결제 도메인 개념을 정리해 Java 엔티티와 값 객체로 재모델링</li>
+        <li>모놀리식, 백오피스에 존재하는 결제와 환불 로직을 정리해 결제 시스템에 이관 및 연동</li>
+        <li>나이스페이먼츠, 카카오페이먼츠, 토스페이먼츠 PG 연동(결제, 환불) 작업</li>
+        <li>비동기 분리 작업</li>
       </ul>
 
       <p class="sub-section">문제 해결 과정</p>
       <ul>
         <li><b>두 DB 동시 갱신 정합성</b>
           <ul>
-            <li>ChainedTransactionManager로 결제 DB와 레거시 DB 동시 갱신 (2PC는 외부 의존성 회피로 미선택)</li>
-            <li>부분 커밋 발생 시 트랜잭션 예외로 Slack 알림 발송</li>
+            <li><b>대안 비교:</b> 평균 50TPS 규모의 단일 인스턴스라 2PC와 Saga 패턴은 복잡도 대비 이득이 없다고 판단. 결제 → 레거시 순서로 커밋을 설계하면 레거시 DB 장애가 아닌 한 정합성이 깨지지 않아, Saga 패턴은 자주 발생하지 않을 상황에 대한 오버엔지니어링으로 배제</li>
+            <li>2PC의 운영, 성능 부담 대신 ChainedTransactionManager로 두 DB를 순차 커밋</li>
+            <li>잔여 리스크인 레거시 커밋 실패만 Slack 알림 + 복구 쿼리로 대응</li>
           </ul>
         </li>
         <li><b>정산 비동기 분리</b>
@@ -427,7 +429,6 @@ flowchart TD
         </li>
         <li><b>테스트로 도메인 정확성 보장</b>
           <ul>
-            <li>TestContainer 기반 통합 테스트로 모놀리식 호출부터 두 DB 갱신, SQS 발행까지 검증</li>
             <li>단위와 통합 테스트 300개 이상 작성, <mark>커버리지 95%</mark> 유지</li>
           </ul>
         </li>
@@ -435,83 +436,8 @@ flowchart TD
 
       <p class="sub-section">기여 성과</p>
       <ul>
-        <li>결제 도메인 단일화로 <mark>PG사 추가 시 한 곳만 수정</mark> (카카오페이 추가로 검증)</li>
-        <li>모놀리식은 그대로 두고 결제만 분리해 <mark>무중단</mark>으로 전환</li>
-        <li>정산 비동기화로 <mark>응답 속도 3.8s → 0.7s</mark></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ===== 프로젝트 2: 권역 이탈 반납 ===== -->
-  <div class="row clearfix layout layout-left border-no">
-    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
-      <h4>권역 이탈 반납 자동 격리</h4>
-      <p><b>구역 밖에 버려진 킥보드를<br>다음 유저가 못 빌리도록 자동 잠금</b></p>
-      <p class="stack">Node.js, Express, MySQL Spatial Index, Read Replica</p>
-      <div class="mermaid-side">
-        <div class="mermaid">
-sequenceDiagram
-    autonumber
-    participant U as 사용자
-    participant R as 4개 반납 경로
-    participant A as 반납 정책 레이어
-    participant DB as Read Replica
-    participant W as Write DB
-    U->>R: 반납 요청
-    R->>A: 통합 진입 함수
-    A->>DB: ST_CONTAINS<br/>(buffer, GPS)
-    DB-->>A: 구역 안/밖
-    alt 구역 밖
-      A->>W: 킥보드 잠금
-    else 구역 안
-      A->>W: 정상 처리
-    end
-        </div>
-      </div>
-    </div>
-    <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
-      <p class="sub-section">프로젝트 개요</p>
-      <p>킥보드가 운영 구역 밖에 반납되면 자동 잠금해 다음 유저가 빌리지 못하게 격리. 현장 직원이 정상 위치로 옮기면 자동 해제.</p>
-
-      <p class="sub-section">팀 구성 및 역할</p>
-      <ul>
-        <li>단독으로 도메인 로직, 공간 쿼리, 4개 반납 경로 통합 담당</li>
-        <li>운영팀과 허용 반경 정책 협의 / 어드민과 CX 팀과 시각화 UX 협의</li>
-      </ul>
-
-      <p class="sub-section">주요 업무</p>
-      <ul>
-        <li>반납 시점 GPS가 운영 구역 안인지 판별 후 구역 밖이면 킥보드 자동 잠금</li>
-        <li>유저, 서버, 직원 종료 등 4개 반납 경로 정책을 공통 레이어로 일원화</li>
-        <li>어드민과 CX 화면에 반납 위치 마커와 구역 폴리곤 시각화</li>
-      </ul>
-
-      <p class="sub-section">문제 해결 과정</p>
-      <ul>
-        <li><b>GPS 소스 선택</b>
-          <ul>
-            <li>사용자 앱 GPS는 실내나 터널에서 100m 이상 튀어 정상 유저 오탐 발생</li>
-            <li>킥보드 단말기 GPS 1순위에 마지막 위치 보조 신호 OR 조합으로 오탐 차단</li>
-          </ul>
-        </li>
-        <li><b>경계선 vs 여유 버퍼</b>
-          <ul>
-            <li>경계선 정확 판별은 GPS 오차 1~2m로 정상 유저까지 잠김</li>
-            <li>경계선과 여유 폭 N m 버퍼 폴리곤을 별도 컬럼으로 운영, 판별은 buffer 기준</li>
-            <li><code>ST_CONTAINS</code>와 MySQL Spatial Index로 구역 수 증가에도 O(log n) 보장</li>
-          </ul>
-        </li>
-        <li><b>운영 트랜잭션 부하 분리</b>
-          <ul>
-            <li>공간 판별 쿼리는 Read Replica로 분리, Write DB는 상태 갱신만 처리</li>
-          </ul>
-        </li>
-      </ul>
-
-      <p class="sub-section">기여 성과</p>
-      <ul>
-        <li>운영팀 수동 모니터링이 <mark>반납 즉시 자동 격리</mark>로 대체</li>
-        <li>이후 친구공유나 예약 반납 같은 신규 경로에 동일 정책 자동 적용 가능한 구조 확보</li>
+        <li>정산 및 로깅 처리 비동기화로 <mark>응답 속도 2.1s → 0.4s</mark></li>
+        <li>모놀리식, 백오피스 서버 무중단 분리 이관</li>
       </ul>
     </div>
   </div>
@@ -526,7 +452,7 @@ sequenceDiagram
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>회원 규모 증가로 Full Scan 방식 지도 영역 조회 API가 RDS 부하와 장애를 유발. 캐싱 전략을 단계적으로 진화시키며 근본 원인까지 해결.</p>
+      <p>평균 250RPS, 피크 400RPS가 몰리는 모놀리식 메인 API에서 Full Scan 쿼리가 RDS CPU 사용량을 끌어올려, 같은 DB를 쓰는 다른 쿼리까지 느려지는 전체 장애로 확산. 캐싱 전략을 단계적으로 진화시키며 근본 원인까지 해결.</p>
 
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
@@ -564,12 +490,66 @@ sequenceDiagram
       <ul>
         <li>처리 속도 <mark>6s → 0.4s</mark> (15배 개선)</li>
         <li>RDS Full Scan으로 인한 장애 재발 차단</li>
-        <li>각 단계의 한계를 다음 단계 근거로 삼은 단계적 의사결정</li>
       </ul>
     </div>
   </div>
 
-  <!-- ===== 프로젝트 4: 멤버십 ===== -->
+   <div class="row clearfix layout layout-left border-no">
+     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
+       <h4>권역 이탈 반납 자동 격리</h4>
+       <p><b>구역 밖에 버려진 킥보드를<br>다음 유저가 못 빌리도록 자동 잠금</b></p>
+       <p class="stack">Node.js, Express, MySQL Spatial Index, Read Replica</p>
+       <div class="mermaid-side">
+       </div>
+     </div>
+     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
+       <p class="sub-section">프로젝트 개요</p>
+       <p>킥보드가 운영 구역 밖에 반납되면 자동 잠금해 다음 유저가 빌리지 못하게 격리. 현장 직원이 정상 위치로 옮기면 자동 해제.</p>
+
+       <p class="sub-section">팀 구성 및 역할</p>
+       <ul>
+         <li>단독으로 도메인 로직, 공간 쿼리, 4개 반납 경로 통합 담당</li>
+         <li>운영팀과 허용 반경 정책 협의 / 어드민과 CX 팀과 시각화 UX 협의</li>
+       </ul>
+
+       <p class="sub-section">주요 업무</p>
+       <ul>
+         <li>반납 시점 GPS가 운영 구역 안인지 판별 후 구역 밖이면 킥보드 자동 잠금</li>
+         <li>유저, 서버, 직원 종료 등 4개 반납 경로 정책을 공통 레이어로 일원화</li>
+         <li>어드민과 CX 화면에 반납 위치 마커와 구역 폴리곤 시각화</li>
+       </ul>
+
+       <p class="sub-section">문제 해결 과정</p>
+       <ul>
+         <li><b>GPS 소스 선택</b>
+           <ul>
+             <li>사용자 앱 GPS는 실내나 터널에서 100m 이상 튀어 정상 유저 오탐 발생</li>
+             <li>킥보드 단말기 GPS 1순위에 마지막 위치 보조 신호 OR 조합으로 오탐 차단</li>
+           </ul>
+         </li>
+         <li><b>경계선 vs 여유 버퍼</b>
+           <ul>
+             <li>경계선 정확 판별은 GPS 오차 1~2m로 정상 유저까지 잠김</li>
+             <li>경계선과 여유 폭 N m 버퍼 폴리곤을 별도 컬럼으로 운영, 판별은 buffer 기준</li>
+             <li><code>ST_CONTAINS</code>와 MySQL Spatial Index로 구역 수 증가에도 O(log n) 보장</li>
+           </ul>
+         </li>
+         <li><b>운영 트랜잭션 부하 분리</b>
+           <ul>
+             <li>공간 판별 쿼리는 Read Replica로 분리, Write DB는 상태 갱신만 처리</li>
+           </ul>
+         </li>
+       </ul>
+
+       <p class="sub-section">기여 성과</p>
+       <ul>
+         <li>운영팀 수동 모니터링이 <mark>반납 즉시 자동 격리</mark>로 대체</li>
+         <li>이후 친구공유나 예약 반납 같은 신규 경로에 동일 정책 자동 적용 가능한 구조 확보</li>
+       </ul>
+     </div>
+   </div>
+
+
   <div class="row clearfix layout layout-left border-no">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
       <h4>멤버십 시스템 개발</h4>
@@ -627,6 +607,7 @@ flowchart LR
       </ul>
     </div>
   </div>
+</div>
 
 <!-- ===== 자격 ===== -->
 <div class="container list-container">
