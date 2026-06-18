@@ -600,14 +600,14 @@ flowchart TB
 
   <div class="row clearfix layout layout-left border-no">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
-      <h4>반납지연 CS 처리 효율화</h4>
-      <p>개발자 확인 없이 CS가 직접 처리, VOC 처리량 56%↑</p>
+      <h4>반납지연 VOC 처리 효율화</h4>
+      <p>로그 연동을 통한 답변 프로세스 개선, VOC 처리량 56%↑</p>
       <p class="stack">Node.js, Express, React, Amplitude, Datadog Logs API</p>
       <img class="caption-img" src="images/voc-screenshot.png" alt="반납지연 VOC 응대 화면" style="max-width: 100%; display: block; margin: 12px auto 0;">
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>반납 실패 문의를 CS가 개발자 확인이나 수기 계산 없이, 종료 시점 추정부터 환불 차액 산정까지 한 화면에서 처리하도록 개선</p>
+      <p>반납 실패 문의를 CS 작업자가 개발자 확인이나 수기 계산 없이, 종료 시점 추정부터 환불 차액 산정까지 한 화면에서 처리하도록 개선</p>
 
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
@@ -643,7 +643,7 @@ flowchart TB
 
       <p class="sub-section">기여 성과</p>
       <ul>
-        <li>CS가 개발자 확인 없이 반납 이슈를 직접 처리 → <mark>개발자 확인 병목 제거</mark></li>
+        <li>CS가 개발자 확인 없이 반납 이슈를 직접 처리 -> 병목 제거</li>
         <li>적정 요금 역산으로 수기 계산 제거, 환불 정확도 확보</li>
         <li>일 평균 VOC 처리 <mark>32건 → 50건 (약 56% 증가)</mark></li>
       </ul>
@@ -658,13 +658,14 @@ flowchart TB
   <div class="row clearfix layout layout-left border-no">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
       <h4>clawd-on-desk</h4>
-      <p><b>AI Agent 모니터링 앱 (4.4k★)</b></p>
+      <p><b>Claude CLI 모니터링</b></p>
       <p class="stack">PowerShell, Node.js, WMI/CIM</p>
+      <p style="margin: 8px 0 4px;"><img src="https://img.shields.io/github/stars/rullerzhou-afk/clawd-on-desk?style=flat&logo=github&color=dfb317" alt="GitHub stars"></p>
       <p style="font-size: 1.3rem; margin-top: 6px;"><a href="https://github.com/rullerzhou-afk/clawd-on-desk/pull/268" target="_blank">PR #268 (Merged)</a></p>
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>Windows 11 24H2에서 제거된 <code>wmic</code>를 PowerShell <code>Get-CimInstance</code>로 전면 교체해 프로세스 감지 호환성 복구</li>
+        <li>Windows 11 24H2에서 제거된 wmic를 PowerShell Get-CimInstance로 교체해 프로세스 감지 호환성 복구</li>
       </ul>
     </div>
   </div>
@@ -706,7 +707,7 @@ flowchart TB
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>학점 3.49 / 4.5</li>
+        <li>학점 3.47 / 4.5</li>
       </ul>
     </div>
   </div>
