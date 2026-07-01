@@ -255,8 +255,9 @@
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>Java/Spring 기반 ERP 백엔드 개발 (재무회계, 예산 모듈)</li>
-        <li>예산, 지출 내역 등 핵심 쿼리 튜닝 및 레거시 개선</li>
+        <li>ERP 솔루션 백엔드 개발 (회계, 예산 모듈)</li>
+        <li><mark>11년 이상</mark> 운영된 레거시 코드 개선 및 신규 이관</li>
+        <li>쿼리 플랜 분석을 통한 튜닝, 인덱스 관리 등 RDB 성능 개선 작업</li>
       </ul>
     </div>
   </div>
@@ -289,8 +290,7 @@
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>Java, Spring Boot, Spring Batch, JPA, MyBatis</li>
-        <li>Node.js, Express</li>
+        <li>Java, Spring Boot, JPA, MyBatis</li>
       </ul>
     </div>
   </div>
@@ -327,7 +327,7 @@
         <li><b>데이터베이스 튜닝:</b> 쿼리 플랜 분석, 인덱스 최적화</li>
         <li><b>트래픽 처리:</b> Rate Limiting, Load Balancing, Redis 캐싱</li>
         <li><b>비동기 처리:</b> SQS, DLQ 핸들링, 멱등성 처리</li>
-        <li><b>모니터링:</b> 커스텀 메트릭 설정 및 분석, Slack 알림 연동</li>
+        <li><b>모니터링:</b> 커스텀 메트릭, Slack 알림 연동</li>
       </ul>
     </div>
   </div>
@@ -577,7 +577,7 @@ flowchart TB
         <li><b>2단계: Redis 글로벌 캐싱</b>
           <ul>
             <li>Write Through + TTL 설정으로 지역 데이터 관리</li>
-            <li>TTL 만료 시 동시 요청이 DB로 몰리는 캐시 스탬피드를, 캐시 갱신 구간에 Redis 분산락을 잠시 잡아 한 요청만 DB를 조회하고 캐시를 채우도록 방지</li>
+            <li>TTL 만료 시 동시 요청이 DB로 몰리는 캐시 스탬피드를, 분산 락으로 잡으며 방지</li>
             <li>WAS 간 일관성 확보로 캐시 불일치 해소</li>
             <li>다만 가맹점 증가로 응답 크기가 커지며 프론트 렌더링 지연 발생</li>
           </ul>
