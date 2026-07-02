@@ -237,7 +237,7 @@
       <p><b>주도적으로 문제를 해결하는 4년차 백엔드 개발자 박정수입니다.</b></p>
       <p>초기 모빌리티 스타트업에 합류해 32명 규모로 회원 <mark>150만</mark>, 매출 <mark>200억 원</mark> 서비스를 만들었습니다. 신규 서비스의 <b>설계부터 런칭, 운영 안정화</b>까지 전 과정에 주도적으로 참여했습니다.</p>
       <p>바닥부터 만들어 본 경험을 바탕으로, 단순 구현보다 <b>문제의 근본 원인을 찾고 구조로 해결</b>하는 것을 선호합니다. 모놀리식 분리, 조회 최적화 등 트래픽이 몰리는 도메인에서 안정화 경험을 쌓아왔습니다.</p>
-      <p>운영 데이터로 검증하며 <b>단계적으로 결정하는 스타일</b>을 가지고 있습니다. 한 번에 완벽한 해답을 찾기보다, 작게 도입한 뒤 한계가 드러나는 지점을 다음 단계의 근거로 삼아 구조를 발전시켜 왔습니다. 최근에는 AI Agent를 적극적으로 활용해 반복 작업과 CS 응대를 자동화하고, 익힌 활용법을 팀에 공유하며 함께 생산성을 끌어올리고 있습니다.</p>
+      <p>운영 데이터로 검증하며 <b>단계적으로 결정하는 스타일</b>을 가지고 있습니다. 한 번에 완벽한 해답을 찾기보다, 작게 도입한 뒤 한계가 드러나는 지점을 다음 단계의 근거로 삼아 구조를 발전시켜 왔습니다.</p>
     </div>
   </div>
 </div>
@@ -350,96 +350,89 @@
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>Claude Code, AI Agent 활용 자동화</li>
+        <li>Claude Code, 반복성 업무 자동화 (Flyweight를 활용한 E2E 테스트 등)</li>
       </ul>
     </div>
   </div>
 </div>
 
-<!--&lt;!&ndash; ===== 씨앤에프시스템 프로젝트 상세 ===== &ndash;&gt;-->
-<!--<div class="container list-container">-->
-<!--  <h3>씨앤에프시스템 주요 프로젝트</h3>-->
+<!-- ===== 씨앤에프시스템 프로젝트 상세 ===== -->
+<div class="container list-container">
+  <h3>씨앤에프시스템 주요 프로젝트</h3>
 
-<!--  <div class="row clearfix layout layout-left border-no">-->
-<!--    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">-->
-<!--      <h4>대량 전표 승인 배치 최적화</h4>-->
-<!--      <p>대량 전표 승인을 청크 배치로 개선<br>1만 건+ 처리 90초 → 2초, OOM 해소</p>-->
-<!--      <p class="stack">Java, Spring(e-gov), MyBatis, Oracle / MariaDB / MSSQL</p>-->
-<!--      <table style="width:100%; border-collapse:collapse; font-size:1.25rem; margin-top:12px;">-->
-<!--        <tr style="background:#f5f5f5;">-->
-<!--          <th style="padding:6px 8px; border:1px solid #e0e0e0; text-align:left;">구분</th>-->
-<!--          <th style="padding:6px 8px; border:1px solid #e0e0e0;">AS-IS</th>-->
-<!--          <th style="padding:6px 8px; border:1px solid #e0e0e0;">TO-BE</th>-->
-<!--        </tr>-->
-<!--        <tr>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0;">처리 시간</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0; color:#c0392b;">90초</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0; color:#27ae60; font-weight:600;">2초</td>-->
-<!--        </tr>-->
-<!--        <tr>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0;">메모리</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0; color:#c0392b;">OOM 실패</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0; color:#27ae60;">안정</td>-->
-<!--        </tr>-->
-<!--        <tr>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0;">DB 왕복</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0;">건별 N회</td>-->
-<!--          <td style="padding:6px 8px; border:1px solid #e0e0e0;">청크당 1회</td>-->
-<!--        </tr>-->
-<!--      </table>-->
-<!--    </div>-->
-<!--    <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">-->
-<!--      <p class="sub-section">프로젝트 개요</p>-->
-<!--      <p>회계전표 승인이 전표를 건별로 조회하고 즉시 커밋하는 구조라 건수에 비례해 느려져, 1만 건 이상의 결산 시 최대 90초가 걸리거나 메모리 부족으로 실패. 처리 구조를 단계적으로 재설계해 해결</p>-->
+  <div class="row clearfix layout layout-left border-no">
+    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
+      <h4>대량 전표 승인 최적화</h4>
+      <p>건별 처리로 1만 건 90초/OOM →<br>청크 배치로 2초 개선</p>
+      <p class="stack">Java, Spring, MyBatis, Oracle / MariaDB / MSSQL</p>
+      <div class="mermaid-side">
+        <div class="mermaid">
+flowchart TD
+    U[결산 담당자] -->|전표 1만+ 건 일괄 승인| SVC[전표 승인 서비스]
+    SVC -->|1,000건 청크 분할| TX["배치 트랜잭션<br/>(REQUIRES_NEW 분리)"]
+    TX -->|고정 단일 SQL 누적| BE["BATCH 반복 실행<br/>실행계획 캐시 재사용"]
+    BE ==>|"청크 단위 flush<br/>메모리 상한 유지"| DB[("Oracle · MariaDB<br/>MSSQL")]
+    BE -. 실패 건 .-> SP["SAVEPOINT 부분 롤백<br/>해당 건만 스킵"]
+    style BE fill:#e3f2fd
+    style DB fill:#fff3a3
+    style SP fill:#ffebee
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
+      <p class="sub-section">프로젝트 개요</p>
+      <p>전표 처리가 단건 처리 구조와 유사해, 결산 시즌에는 1만 건 이상 일괄 처리 시 최대 90초가 걸리거나 OOM이 걸리는 문제가 발생해 개선</p>
 
-<!--      <p class="sub-section">팀 구성 및 역할</p>-->
-<!--      <ul>-->
-<!--        <li>단독으로 원인 분석, 배치 구조 설계, 3종 DBMS 매퍼 적용까지 수행</li>-->
-<!--      </ul>-->
+      <p class="sub-section">팀 구성 및 역할</p>
+      <ul>
+        <li>단독 수행 — 병목 진단, 배치 구조 설계, 성능 최적화</li>
+      </ul>
 
-<!--      <p class="sub-section">주요 업무</p>-->
-<!--      <ul>-->
-<!--        <li>건별 조회와 즉시 커밋으로 동작하던 전표 승인 및 취소 로직의 병목 진단</li>-->
-<!--        <li>전자문서 연계 조회를 다중조회로 묶어 반복 쿼리 제거</li>-->
-<!--        <li>MyBatis 실행 방식을 BATCH로 전환하고 청크 단위 flush로 메모리 제어</li>-->
-<!--        <li>운영 DB가 기관별로 달라 Oracle, MariaDB, MSSQL 매퍼를 동시 반영</li>-->
-<!--      </ul>-->
+      <p class="sub-section">주요 업무</p>
+      <ul>
+        <li>건별로 동작하던 전표 승인, 취소 로직의 병목 진단</li>
+        <li>건수마다 형태가 변하던 MyBatis 동적 쿼리를 고정 SQL + BATCH 실행으로 재설계해 실행계획 재사용 유도</li>
+      </ul>
 
-<!--      <p class="sub-section">문제 해결 과정</p>-->
-<!--      <ul>-->
-<!--        <li><b>진단: 건별 처리에서 두 가지 병목 확인</b>-->
-<!--          <ul>-->
-<!--            <li>전표마다 전자문서 번호를 1건씩 조회하는 <mark>N+1 쿼리</mark></li>-->
-<!--            <li>삭제와 갱신을 건별로 즉시 실행해 건수만큼 DB 왕복 발생</li>-->
-<!--          </ul>-->
-<!--        </li>-->
-<!--        <li><b>1단계: N+1 제거</b>-->
-<!--          <ul>-->
-<!--            <li>청크 단위로 전표 번호를 모아 IN절 다중조회로 변경, 조회 횟수를 <mark>1,000회 → 1회</mark>로 축소</li>-->
-<!--          </ul>-->
-<!--        </li>-->
-<!--        <li><b>2단계: BATCH Executor 전환</b>-->
-<!--          <ul>-->
-<!--            <li>건별 즉시 실행을 MyBatis BATCH 세션 누적 방식으로 변경, 1,000건마다 flush로 메모리 점유를 제어해 OOM 차단</li>-->
-<!--            <li>청크 크기를 500에서 1,000으로 조정하며 처리 시간과 메모리 사이 균형점 확인</li>-->
-<!--          </ul>-->
-<!--        </li>-->
-<!--        <li><b>3단계: 트랜잭션 경계 분리</b>-->
-<!--          <ul>-->
-<!--            <li>전표 검증과 승인번호 채번 조회가 SIMPLE executor로 먼저 실행돼, 한 트랜잭션 내에서는 BATCH로 전환할 수 없어 배치를 <code>REQUIRES_NEW</code>로 별도 트랜잭션 분리</li>-->
-<!--            <li>승인번호는 전체 배치에 한 번만 발급하고, 실패 시 해당 전표번호를 예외로 전파해 실패 지점을 추적 가능하게 구성</li>-->
-<!--          </ul>-->
-<!--        </li>-->
-<!--      </ul>-->
+      <p class="sub-section">문제 해결 과정</p>
+      <ul>
+        <li><b>병목 진단</b>
+          <ul>
+            <li>건수만큼 UPDATE 문을 이어붙이는 MyBatis 동적 쿼리라, 실행 때마다 SQL 형태가 바뀌어 옵티마이저가 매번 하드 파싱하는 문제 발생</li>
+            <li>전표별 문서 조회와 건별 즉시 실행으로 문장마다 DB를 왕복해, 왕복 횟수가 건수에 비례해 폭증함</li>
+          </ul>
+        </li>
+        <li><b>실행계획이 재사용되도록 SQL 실행 구조 변경</b>
+          <ul>
+            <li>건수마다 변하던 동적 UPDATE를 배치에 적합한 단일 UPDATE 문장으로 재작성해, 매 실행 같은 PreparedStatement를 재사용</li>
+            <li>SQL 텍스트가 고정돼 DB가 <mark>소프트 파싱</mark>하므로, 건수만큼 반복되던 하드 파싱을 제거</li>
+          </ul>
+        </li>
+        <li><b>BATCH 세션 flush로 메모리 제어</b>
+          <ul>
+            <li>1,000건마다 세션에 쌓인 누적분을 비워 힙 상한을 유지하고, 청크 크기를 조정하며 균형점 확인</li>
+          </ul>
+        </li>
+        <li><b>Executor 충돌 → 트랜잭션 경계 분리</b>
+          <ul>
+            <li>상위 서비스의 조회가 SIMPLE executor로 먼저 실행돼 같은 트랜잭션에서 BATCH 전환이 막히는 문제를, 배치를 <code>REQUIRES_NEW</code>로 분리해 해결</li>
+          </ul>
+        </li>
+        <li><b>실패 건 격리</b>
+          <ul>
+            <li>SAVEPOINT 부분 롤백으로 실패한 전표만 스킵하고 나머지는 처리를 지속, 실패 전표번호를 특정해 전파</li>
+          </ul>
+        </li>
+      </ul>
 
-<!--      <p class="sub-section">기여 성과</p>-->
-<!--      <ul>-->
-<!--        <li>1만 건 이상 승인 처리 <mark>90초 → 2초, OOM 해소</mark></li>-->
-<!--        <li>대용량 결산 시점의 처리 실패 차단으로 운영 안정성 확보</li>-->
-<!--      </ul>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+      <p class="sub-section">기여 성과</p>
+      <ul>
+        <li>1만 건 이상 승인 처리 <mark>90초 → 2초</mark> (약 45배)</li>
+        <li>결산 피크의 OOM 실패 차단, 실패 건만 격리해 부분 실패가 전체 배치를 막지 않도록 운영 안정성 확보</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 
 <div class="container list-container">
@@ -598,58 +591,58 @@ flowchart TB
     </div>
   </div>
 
-  <div class="row clearfix layout layout-left border-no">
-    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
-      <h4>반납지연 VOC 처리 효율화</h4>
-      <p>로그 연동을 통한 답변 프로세스 개선, VOC 처리량 56%↑</p>
-      <p class="stack">Node.js, Express, React, Amplitude, Datadog Logs API</p>
-      <img class="caption-img" src="images/voc-screenshot.png" alt="반납지연 VOC 응대 화면" style="max-width: 100%; display: block; margin: 12px auto 0;">
-    </div>
-    <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
-      <p class="sub-section">프로젝트 개요</p>
-      <p>반납 실패 문의를 CS 작업자가 개발자 확인이나 수기 계산 없이, 종료 시점 추정부터 환불 차액 산정까지 한 화면에서 처리하도록 개선</p>
+<!--  <div class="row clearfix layout layout-left border-no">-->
+<!--    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">-->
+<!--      <h4>반납지연 VOC 처리 효율화</h4>-->
+<!--      <p>로그 연동을 통한 답변 프로세스 개선, VOC 처리량 56%↑</p>-->
+<!--      <p class="stack">Node.js, Express, React, Amplitude, Datadog Logs API</p>-->
+<!--      <img class="caption-img" src="images/voc-screenshot.png" alt="반납지연 VOC 응대 화면" style="max-width: 100%; display: block; margin: 12px auto 0;">-->
+<!--    </div>-->
+<!--    <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">-->
+<!--      <p class="sub-section">프로젝트 개요</p>-->
+<!--      <p>반납 실패 문의를 CS 작업자가 개발자 확인이나 수기 계산 없이, 종료 시점 추정부터 환불 차액 산정까지 한 화면에서 처리하도록 개선</p>-->
 
-      <p class="sub-section">팀 구성 및 역할</p>
-      <ul>
-        <li>단독 진행. 로깅 연동, 실이용 추정 로직, 적정 요금 역산, 응대 화면 통합</li>
-      </ul>
+<!--      <p class="sub-section">팀 구성 및 역할</p>-->
+<!--      <ul>-->
+<!--        <li>단독 진행. 로깅 연동, 실이용 추정 로직, 적정 요금 역산, 응대 화면 통합</li>-->
+<!--      </ul>-->
 
-      <p class="sub-section">주요 업무</p>
-      <ul>
-        <li>Amplitude, Datadog 로그와 위치 정지 패턴으로 실이용 종료 시점 추정</li>
-        <li>지역 요금제로 적정 요금을 역산해 환불 차액을 CS 화면에 제시</li>
-        <li>반납 이슈 지도 마커 시각화, 중복 로그 호출 캐싱</li>
-      </ul>
+<!--      <p class="sub-section">주요 업무</p>-->
+<!--      <ul>-->
+<!--        <li>Amplitude, Datadog 로그와 위치 정지 패턴으로 실이용 종료 시점 추정</li>-->
+<!--        <li>지역 요금제로 적정 요금을 역산해 환불 차액을 CS 화면에 제시</li>-->
+<!--        <li>반납 이슈 지도 마커 시각화, 중복 로그 호출 캐싱</li>-->
+<!--      </ul>-->
 
-      <p class="sub-section">문제 해결 과정</p>
-      <ul>
-        <li><b>실이용 종료 시점 추정</b>
-          <ul>
-            <li>종료 기록이 없는 건은 클라이언트와 서버 로그를 불러와 대조하고, 킥보드 GPS가 멈춘 위치와 시점으로 실제 반납 시점 추정</li>
-            <li>반납 시도 위치와 정지 구간을 지도 마커로 표기해 응대자가 추정 근거를 화면에서 확인</li>
-          </ul>
-        </li>
-        <li><b>적정 요금 역산</b>
-          <ul>
-            <li>추정 종료 시각과 지역 요금제로 적정액을 계산, 부과액과의 차액을 표시해 수기 계산 제거</li>
-          </ul>
-        </li>
-        <li><b>중복 호출 캐싱</b>
-          <ul>
-            <li>동일 로그 반복 호출을 캐싱으로 묶어 외부 API 호출 감소</li>
-          </ul>
-        </li>
-      </ul>
+<!--      <p class="sub-section">문제 해결 과정</p>-->
+<!--      <ul>-->
+<!--        <li><b>실이용 종료 시점 추정</b>-->
+<!--          <ul>-->
+<!--            <li>종료 기록이 없는 건은 클라이언트와 서버 로그를 불러와 대조하고, 킥보드 GPS가 멈춘 위치와 시점으로 실제 반납 시점 추정</li>-->
+<!--            <li>반납 시도 위치와 정지 구간을 지도 마커로 표기해 응대자가 추정 근거를 화면에서 확인</li>-->
+<!--          </ul>-->
+<!--        </li>-->
+<!--        <li><b>적정 요금 역산</b>-->
+<!--          <ul>-->
+<!--            <li>추정 종료 시각과 지역 요금제로 적정액을 계산, 부과액과의 차액을 표시해 수기 계산 제거</li>-->
+<!--          </ul>-->
+<!--        </li>-->
+<!--        <li><b>중복 호출 캐싱</b>-->
+<!--          <ul>-->
+<!--            <li>동일 로그 반복 호출을 캐싱으로 묶어 외부 API 호출 감소</li>-->
+<!--          </ul>-->
+<!--        </li>-->
+<!--      </ul>-->
 
-      <p class="sub-section">기여 성과</p>
-      <ul>
-        <li>CS가 개발자 확인 없이 반납 이슈를 직접 처리 -> 병목 제거</li>
-        <li>적정 요금 역산으로 수기 계산 제거, 환불 정확도 확보</li>
-        <li>일 평균 VOC 처리 <mark>32건 → 50건 (약 56% 증가)</mark></li>
-      </ul>
-    </div>
-  </div>
-</div>
+<!--      <p class="sub-section">기여 성과</p>-->
+<!--      <ul>-->
+<!--        <li>CS가 개발자 확인 없이 반납 이슈를 직접 처리 -> 병목 제거</li>-->
+<!--        <li>적정 요금 역산으로 수기 계산 제거, 환불 정확도 확보</li>-->
+<!--        <li>일 평균 VOC 처리 <mark>32건 → 50건 (약 56% 증가)</mark></li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 
 <!-- ===== 오픈소스 기여 ===== -->
 <div class="container list-container">
