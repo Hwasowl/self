@@ -40,7 +40,7 @@
     margin-bottom: 40px;
   }
   h4 { font-weight: 300; font-size: 2.5rem; margin-bottom: 3px; }
-  p, ul { font-size: 1.6rem; text-align: justify; }
+  p, ul { font-size: 1.6rem; text-align: left; }
   a { color: #477dca; text-decoration: none; transition: color 150ms ease; }
   a:hover, a:focus { color: #355e98; }
   a i { font-size: 1.6rem; }
@@ -326,7 +326,7 @@
       <ul>
         <li><b>데이터베이스 튜닝:</b> 쿼리 플랜 분석, 인덱스 최적화</li>
         <li><b>트래픽 처리:</b> Rate Limiting, Load Balancing, Redis 캐싱</li>
-        <li><b>비동기 처리:</b> SQS, DLQ 핸들링, 멱등성 처리</li>
+        <li><b>비동기 처리:</b> SNS/SQS, DLQ 핸들링, 멱등성 처리</li>
         <li><b>모니터링:</b> 커스텀 메트릭, Slack 알림 연동</li>
       </ul>
     </div>
@@ -367,21 +367,34 @@
       <p class="stack">Java, Spring, MyBatis, Oracle / MariaDB / MSSQL</p>
       <div class="mermaid-side">
         <div class="mermaid">
-flowchart TD
-    U[결산 담당자] -->|전표 1만+ 건 일괄 승인| SVC[전표 승인 서비스]
-    SVC -->|1,000건 청크 분할| TX["배치 트랜잭션<br/>(REQUIRES_NEW 분리)"]
-    TX -->|고정 단일 SQL 누적| BE["BATCH 반복 실행<br/>실행계획 캐시 재사용"]
-    BE ==>|"청크 단위 flush<br/>메모리 상한 유지"| DB[("Oracle · MariaDB<br/>MSSQL")]
-    BE -. 실패 건 .-> SP["SAVEPOINT 부분 롤백<br/>해당 건만 스킵"]
-    style BE fill:#e3f2fd
-    style DB fill:#fff3a3
+flowchart TB
+    U([결산 담당자]) -->|1만+ 건 승인| LOAD
+    subgraph APP["애플리케이션"]
+      direction TB
+      LOAD["대상 전표 조회<br/>검증, 승인번호 채번"] --> CHUNK["1,000건 청크 분할"]
+      CHUNK --> BATCH["고정 SQL<br/>BATCH 누적"]
+      BATCH --> FLUSH["청크마다 flush<br/>메모리 제어"]
+    end
+    subgraph DBLAYER["DB"]
+      direction TB
+      CACHE["실행계획 캐시 히트<br/>하드파싱 제거"]
+      DBS[("Oracle / MariaDB / MSSQL")]
+      CACHE --> DBS
+    end
+    FLUSH ==>|고정 SQL 반복| CACHE
+    BATCH -. 실패 건 .-> SP["SAVEPOINT 롤백<br/>실패 건 스킵"]
+    style APP fill:#f5f9ff,stroke:#3b82f6
+    style DBLAYER fill:#f1f8f4,stroke:#27ae60
+    style BATCH fill:#e3f2fd
+    style FLUSH fill:#fff3a3
+    style CACHE fill:#fff3a3
     style SP fill:#ffebee
         </div>
       </div>
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>전표 처리가 단건 처리 구조와 유사해, 결산 시즌에는 1만 건 이상 일괄 처리 시 최대 90초가 걸리거나 OOM이 걸리는 문제가 발생해 개선</p>
+      <p>결산 시즌, 회계 전표 1만 건 이상 일괄 처리 시 최대 90초가 소요되거나 OOM 문제가 발생하며 이를 개선</p>
 
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
@@ -398,29 +411,24 @@ flowchart TD
       <ul>
         <li><b>병목 진단</b>
           <ul>
-            <li>건수만큼 UPDATE 문을 이어붙이는 MyBatis 동적 쿼리라, 실행 때마다 SQL 형태가 바뀌어 옵티마이저가 매번 하드 파싱하는 문제 발생</li>
-            <li>전표별 문서 조회와 건별 즉시 실행으로 문장마다 DB를 왕복해, 왕복 횟수가 건수에 비례해 폭증함</li>
+            <li>건수만큼 UPDATE 문을 이어붙이는 MyBatis 동적 쿼리라, 건수와 데이터에 따라 SQL 형태가 바뀌어 옵티마이저가 반복적으로 하드 파싱하는 문제 발생</li>
           </ul>
         </li>
         <li><b>실행계획이 재사용되도록 SQL 실행 구조 변경</b>
           <ul>
-            <li>건수마다 변하던 동적 UPDATE를 배치에 적합한 단일 UPDATE 문장으로 재작성해, 매 실행 같은 PreparedStatement를 재사용</li>
-            <li>SQL 텍스트가 고정돼 DB가 <mark>소프트 파싱</mark>하므로, 건수만큼 반복되던 하드 파싱을 제거</li>
+            <li>건수마다 변하던 동적 UPDATE를 단일 UPDATE 문장으로 변경해, 매 실행 같은 PreparedStatement를 재사용</li>
+            <li>SQL 텍스트가 고정되어 옵티마이저가 소프트 파싱하므로, 건수만큼 반복되던 하드 파싱 문제 개선</li>
+          </ul>
+        </li>
+        <li><b>MyBatis Executor 충돌 → 트랜잭션 경계 분리</b>
+          <ul>
+            <li>상위 서비스의 조회가 SIMPLE executor로 먼저 실행돼 같은 트랜잭션에서 BATCH 전환이 막히는 문제를, 트랜잭션 전파 옵션 REQUIRES_NEW로 분리해 해결</li>
+            <li>SAVEPOINT 부분 롤백으로 실패한 전표만 스킵하고 나머지는 처리를 지속, 실패 전표번호는 따로 수집해 안내</li>
           </ul>
         </li>
         <li><b>BATCH 세션 flush로 메모리 제어</b>
           <ul>
             <li>1,000건마다 세션에 쌓인 누적분을 비워 힙 상한을 유지하고, 청크 크기를 조정하며 균형점 확인</li>
-          </ul>
-        </li>
-        <li><b>Executor 충돌 → 트랜잭션 경계 분리</b>
-          <ul>
-            <li>상위 서비스의 조회가 SIMPLE executor로 먼저 실행돼 같은 트랜잭션에서 BATCH 전환이 막히는 문제를, 배치를 <code>REQUIRES_NEW</code>로 분리해 해결</li>
-          </ul>
-        </li>
-        <li><b>실패 건 격리</b>
-          <ul>
-            <li>SAVEPOINT 부분 롤백으로 실패한 전표만 스킵하고 나머지는 처리를 지속, 실패 전표번호를 특정해 전파</li>
           </ul>
         </li>
       </ul>
@@ -434,14 +442,13 @@ flowchart TD
   </div>
 </div>
 
-
 <div class="container list-container">
   <h3>디어코퍼레이션 주요 프로젝트</h3>
 
   <div class="row clearfix layout layout-left border-no">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
-      <h4>결제 시스템 구축 및 이관</h4>
-      <p>두 서버에 흩어진 결제, 환불, 정산을<br>단일 결제 서비스로 통합</p>
+      <h4>결제 시스템 마이그레이션</h4>
+      <p>Node.js 모놀리식의 결제 도메인을<br>Java 결제 서비스로 마이그레이션</p>
       <p class="stack">Java 17, Spring Boot, JUnit 5, TestContainer, Aurora MySQL 8.0, Redis, SQS</p>
       <div class="mermaid-side">
         <div class="mermaid">
@@ -452,7 +459,9 @@ flowchart TD
     BO -->|환불 요청| P
     P -. ChainedTx 순차 커밋 .-> DBS[("결제 DB → 레거시 DB")]
     DBS -. 커밋 실패 .-> SL[Slack 알림 / 복구 Query]
-    P == 결제/환불 이벤트 ==> Q[SQS]
+    P ==결제/환불 이벤트 발행==> N[SNS 토픽]
+                 N --> Q[SQS 구독]
+                 Q --> S[정산 서버]
     Q --> S[정산 서버]
     Q -. 실패 .-> DLQ[DLQ]
     style P fill:#e3f2fd
@@ -464,8 +473,8 @@ flowchart TD
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>결제, 환불, 정산 로직이 모놀리식과 백오피스 서버에 흩어져 변경마다 양쪽을 중복 수정하던 구조를 별도 결제 서비스로 분리</p>
 
+      <p>모놀리식과 백오피스에 흩어져 변경마다 중복 수정하던 결제/환불/정산 로직을 Node.js에서 Spring Boot 기반 결제 서비스로 마이그레이션</p>
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
         <li>3명 백엔드 팀으로 진행</li>
@@ -482,17 +491,18 @@ flowchart TD
 
       <p class="sub-section">문제 해결 과정</p>
       <ul>
-        <li><b>두 DB 동시 갱신 정합성</b>
+        <li><b>레거시 정합성 관리</b>
           <ul>
-            <li><b>대안 비교:</b> 평균 50TPS 규모의 단일 결제 서버 인스턴스라 2PC와 Saga 패턴은 복잡도 대비 이득이 없다고 판단</li>
-            <li>유입 트래픽과 운영 난이도를 고려해 ChainedTransactionManager로 두 DB를 순차 커밋 (결제 -> 레거시 순서)</li>
-            <li>잔여 리스크인 부분 커밋 실패 발생 시 Slack 알림 + 복구 쿼리로 대응</li>
+            <li>결제 도메인은 분리했지만 레거시가 아직 결제 데이터를 읽어, 결제 시 신규 결제 DB와 레거시 DB에 함께 기록해야 했음</li>
+            <li>두 DB를 원자적으로 묶는 2PC까지는 규모상 과하다 판단, 순서대로 커밋하는 ChainedTransactionManager 도입</li>
+            <li>순차 커밋은 실패 시 부분 반영 문제가 발생할 수 있어, 그 경우 Slack 알림과 복구 쿼리로 보정</li>
+<!--            <li>단일 인스턴스 + 50TPS 규모엔 충분하다 판단해, Outbox/Saga 같은 이벤트 기반 정합은 이후 과제로 결정</li>-->
           </ul>
         </li>
         <li><b>정산 비동기 분리</b>
           <ul>
-            <li>결제 완료 시점에 SQS로 결제 이벤트 발행, 정산 서버 비동기 컨슘</li>
-            <li>실패는 DLQ 재시도와 청구서 ID 기반 멱등성 키로 중복 정산 방지</li>
+            <li>결제/환불 커밋 이후, SNS 토픽에 이벤트 발행 → 정산 서버가 구독 SQS로 컨슘</li>
+            <li>청구서 ID 기반 멱등성 키로 중복 정산을 방지하고, 처리 실패 시 DLQ를 통한 관리</li>
           </ul>
         </li>
         <li><b>테스트로 도메인 정확성 보장</b>
@@ -505,7 +515,7 @@ flowchart TD
       <p class="sub-section">기여 성과</p>
       <ul>
         <li>정산 및 로깅 처리 비동기화로 <mark>응답 속도 2.1s → 0.4s</mark></li>
-        <li>모놀리식, 백오피스 서버 무중단 분리 이관</li>
+        <li>레거시와 신규 서비스가 공존하는 상태에서 무중단 분리 이관 완료</li>
       </ul>
     </div>
   </div>
@@ -545,7 +555,7 @@ flowchart TB
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <p class="sub-section">프로젝트 개요</p>
-      <p>지역 조회 API의 RDS Full Scan 쿼리가 CPU 사용량을 포화시켜 Timeout이 발생했고, 전체 서비스 장애로 확산되었음. 이에 캐싱 전략을 점진적으로 도입하며 해결</p>
+      <p>지도 조회 API가 RDS CPU를 포화시켜 Timeout이 발생하고, 공유 DB를 쓰는 전체 서비스 장애로 확산. 캐싱으로 당장의 부하를 걷어낸 뒤, 최종적으로 조회 범위 자체를 줄여 원인을 제거</p>
 
       <p class="sub-section">팀 구성 및 역할</p>
       <ul>
@@ -559,12 +569,18 @@ flowchart TB
         <li>Write Through, TTL 기반 캐시 일관성 관리와 응답 크기 축소로 장애와 렌더링 지연 해소</li>
       </ul>
 
+      <p class="sub-section">문제 원인</p>
+      <ul>
+        <li>지도 화면에 진입할 때마다 운영 구역 폴리곤을 사용자 위치와 무관하게 모두 반환해 매 요청이 Full Scan으로 실행됨</li>
+        <li>서비스 지역과 가맹점이 늘수록 조회량과 응답 크기가 함께 커졌고, 피크 시간대 RDS CPU가 포화되며 같은 DB를 쓰는 전체 서비스로 장애가 확산됨</li>
+      </ul>
+
       <p class="sub-section">문제 해결 과정</p>
       <ul>
         <li><b>1단계: 로컬 캐싱</b>
           <ul>
             <li>변경 빈도 낮은 지역 데이터에 WAS 로컬 캐싱 적용으로 <mark>6s → 0.4s</mark></li>
-            <li>PM 규제 법안이 추가된 이후, 지역 데이터 변경이 잦아지며 WAS 증설 시 인스턴스별 캐시 불일치 발생</li>
+            <li>하지만 PM 규제 법안이 추가된 이후 지역 데이터 변경이 잦아지며, WAS 증설 시 인스턴스별 캐시 불일치 발생</li>
           </ul>
         </li>
         <li><b>2단계: Redis 글로벌 캐싱</b>
@@ -572,13 +588,13 @@ flowchart TB
             <li>Write Through + TTL 설정으로 지역 데이터 관리</li>
             <li>TTL 만료 시 동시 요청이 DB로 몰리는 캐시 스탬피드를, 분산 락으로 잡으며 방지</li>
             <li>WAS 간 일관성 확보로 캐시 불일치 해소</li>
-            <li>다만 가맹점 증가로 응답 크기가 커지며 프론트 렌더링 지연 발생</li>
+            <li>다만 지속적인 가맹점 증가로 응답 크기가 커지며 프론트 렌더링 지연 발생</li>
           </ul>
         </li>
-        <li><b>3단계: 공간 쿼리</b>
+        <li><b>3단계: 공간 쿼리로 조회 범위 축소</b>
           <ul>
-            <li>MySQL Geometry 함수로 사용자 인접 지역만 조회하도록 변경</li>
-            <li>응답 크기 자체를 축소해 렌더링 지연 해소</li>
+            <li>MySQL Geometry 함수로 전 지역 대신 사용자 인접 지역만 조회하도록 변경, Full Scan의 원인이던 조회 범위 축소</li>
+            <li>응답 크기도 함께 줄어 프론트 렌더링 지연 해소</li>
           </ul>
         </li>
       </ul>
@@ -586,10 +602,11 @@ flowchart TB
       <p class="sub-section">기여 성과</p>
       <ul>
         <li>처리 속도 <mark>6s → 0.4s</mark> (15배 개선)</li>
-        <li>RDS Full Scan으로 인한 장애 재발 차단</li>
+        <li>조회 범위 축소로 Full Scan 원인을 제거, <mark>RDS 사용량 56% 절감</mark>으로 장애 재발 차단</li>
       </ul>
     </div>
   </div>
+</div>
 
 <!--  <div class="row clearfix layout layout-left border-no">-->
 <!--    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">-->
@@ -658,7 +675,8 @@ flowchart TB
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       <ul>
-        <li>Windows 11 24H2에서 제거된 wmic를 PowerShell Get-CimInstance로 교체해 프로세스 감지 호환성 복구</li>
+        <li>윈도우 환경에서 주기적으로 세션 이동 기능이 작동하지 않아, 직접 fork 후 문제 원인 파악</li>
+        <li>Windows 11 24H2 빌드에서 제거된 wmic 함수를 PowerShell Get-CimInstance로 교체해 프로세스 감지 기능 복구</li>
       </ul>
     </div>
   </div>
